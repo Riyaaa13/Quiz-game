@@ -1,0 +1,128 @@
+import javax.swing.JOptionPane;
+import java.util.Scanner;
+
+public class Quiz {
+    private static final int NUM_ROUNDS = 3;
+    private static final int NUM_QUESTIONS_PER_ROUND = 5;
+    private static final int TIME_LIMIT = 30; // seconds
+    private static final String[] questions = {
+        // Round 1 (India-related)
+        "Which city is the capital of India?",
+        "Who is known as the Father of the Nation in India?",
+        "What is the national animal of India?",
+        "Which river is known as the Ganges in India?",
+        "Which Indian festival is known as the Festival of Lights?",
+        // Round 2 (India-related)
+        "What is the national flower of India?",
+        "Which Indian state is known as the 'Land of Five Rivers'?",
+        "Who was the first woman Prime Minister of India?",
+        "What is the national sport of India?",
+        "Which Indian monument is considered one of the Seven Wonders of the World?",
+        // Round 3 (IT company co-founders)
+        "Who is the co-founder of Microsoft?",
+        "Who co-founded Apple Inc. along with Steve Jobs?",
+        "Who is the co-founder of Google?",
+        "Who is the co-founder of Facebook?",
+        "Who is the co-founder of Amazon?"
+    };
+    private static final String[][] options = {
+        // Round 1 (India-related)
+        {"A. Delhi", "B. Mumbai", "C. Kolkata", "D. Chennai"},
+        {"A. Mahatma Gandhi", "B. Jawaharlal Nehru", "C. Subhash Chandra Bose", "D. Sardar Vallabhbhai Patel"},
+        {"A. Tiger", "B. Elephant", "C. Lion", "D. Panda"},
+        {"A. Yamuna", "B. Godavari", "C. Ganges", "D. Brahmaputra"},
+        {"A. Diwali", "B. Holi", "C. Durga Puja", "D. Eid"},
+        // Round 2 (India-related)
+        {"A. Rose", "B. Lotus", "C. Sunflower", "D. Jasmine"},
+        {"A. Punjab", "B. Haryana", "C. Himachal Pradesh", "D. Uttar Pradesh"},
+        {"A. Indira Gandhi", "B. Pratibha Patil", "C. Sonia Gandhi", "D. Mayawati"},
+        {"A. Hockey", "B. Cricket", "C. Football", "D. Badminton"},
+        {"A. Taj Mahal", "B. Qutub Minar", "C. Red Fort", "D. India Gate"},
+        // Round 3 (IT company co-founders)
+        {"A. Bill Gates", "B. Steve Jobs", "C. Mark Zuckerberg", "D. Jeff Bezos"},
+        {"A. Steve Wozniak", "B. Bill Gates", "C. Tim Cook", "D. Larry Page"},
+        {"A. Larry Page", "B. Sergey Brin", "C. Jeff Bezos", "D. Mark Zuckerberg"},
+        {"A. Mark Zuckerberg", "B. Bill Gates", "C. Steve Jobs", "D. Larry Page"},
+        {"A. Jeff Bezos", "B. Steve Jobs", "C. Bill Gates", "D. Larry Page"}
+    };
+    private static final int[] correctAnswers = {
+        // Round 1 (India-related)
+        0, 0, 1, 2, 0,
+        // Round 2 (India-related)
+        1, 0, 0, 0, 0,
+        // Round 3 (IT company co-founders)
+        0, 0, 1, 0, 0
+    }; // Index of correct option for each question
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int totalScore = 0;
+
+        for (int round = 1; round <= NUM_ROUNDS; round++) {
+            int roundScore = playRound(round, scanner);
+            totalScore += roundScore;
+            
+            if (round < NUM_ROUNDS) {
+                int option = JOptionPane.showConfirmDialog(null, "Do you want to play the next round?", "Next Round", JOptionPane.YES_NO_OPTION);
+                if (option == JOptionPane.NO_OPTION) {
+                    option = JOptionPane.showConfirmDialog(null, "Do you really want to exit?", "Exit Confirmation", JOptionPane.YES_NO_OPTION);
+                    if (option == JOptionPane.YES_OPTION) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        JOptionPane.showMessageDialog(null, "Total score: " + totalScore);
+        displayIncorrectAnswers();
+        JOptionPane.showMessageDialog(null, "Thank you for playing!");
+    }
+
+    private static int playRound(int round, Scanner scanner) {
+        int score = 0;
+        int startIndex = (round - 1) * NUM_QUESTIONS_PER_ROUND;
+        int endIndex = round * NUM_QUESTIONS_PER_ROUND;
+
+        for (int i = startIndex; i < endIndex; i++) {
+            StringBuilder message = new StringBuilder("Round " + round + ", Question " + (i - startIndex + 1) + ": " + questions[i] + "\n");
+            for (String option : options[i]) {
+                message.append(option).append("\n");
+            }
+
+            String userAnswer = "";
+            while (!userAnswer.matches("[A-D]")) {
+                userAnswer = JOptionPane.showInputDialog(null, message.toString() + "\nEnter your answer (A/B/C/D) or type 'exit' to quit the quiz:");
+                if (userAnswer == null || userAnswer.equalsIgnoreCase("exit")) {
+                    break;
+                } else if (!userAnswer.matches("[A-D]")) {
+                    JOptionPane.showMessageDialog(null, "Please select a valid option (A/B/C/D).");
+                }
+            }
+
+            if (userAnswer == null || userAnswer.equalsIgnoreCase("exit")) {
+                break;
+            }
+
+            // Check if the answer is correct within the time limit
+            if (userAnswer.equalsIgnoreCase(options[i][correctAnswers[i]].substring(0, 1))) {
+                score++;
+                JOptionPane.showMessageDialog(null, "Correct!");
+            } else {
+                JOptionPane.showMessageDialog(null, "Incorrect!");
+            }
+        }
+        
+        return score;
+    }
+
+    private static void displayIncorrectAnswers() {
+        StringBuilder message = new StringBuilder("Incorrect answers:\n");
+        for (int i = 0; i < questions.length; i++) {
+            if (!options[i][correctAnswers[i]].substring(0, 1).equals(String.valueOf(correctAnswers[i]))) {
+                message.append("Question: ").append(questions[i]).append("\n");
+                message.append("Correct answer: ").append(options[i][correctAnswers[i]]).append("\n\n");
+            }
+        }
+        JOptionPane.showMessageDialog(null, message.toString());
+    }
+}
